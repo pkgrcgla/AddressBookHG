@@ -6,10 +6,13 @@ using AddressBookHG_DL.ImplementationsOfRepos;
 using AddressBookHG_DL.InterfaceOfRepos;
 using AddressBookHG_EL.IdentityModels;
 using AddressBookHG_EL.Mappings;
+using AddressBookHG_PL.CreateDefaultData;
 using AutoMapper.Extensions.ExpressionMapping;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
 //contexti ayarliyoruz.
 builder.Services.AddDbContext<AddressbookContext>(options =>
 {
@@ -23,13 +26,16 @@ builder.Services.AddDbContext<AddressbookContext>(options =>
 //appuser ve approle identity ayari
 builder.Services.AddIdentity<AppUser, AppRole>(opt =>
 {
-opt.Password.RequiredLength = 8;
-opt.Password.RequireNonAlphanumeric = true;
-opt.Password.RequireLowercase = true;
-opt.Password.RequireUppercase = true;
-opt.Password.RequireDigit = true;
-opt.User.RequireUniqueEmail = true;
-//opt.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+&%";
+    opt.Password.RequiredLength = 8;
+    opt.Password.RequireNonAlphanumeric = true;
+    opt.Password.RequireLowercase = true;
+    opt.Password.RequireUppercase = true;
+    opt.Password.RequireDigit = true;
+    opt.User.RequireUniqueEmail = true;
+    //opt.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+&%";
+
+}).AddDefaultTokenProviders().AddEntityFrameworkStores<AddressbookContext>();
+
 
 //automapper ayari 
 builder.Services.AddAutoMapper(a =>
@@ -61,6 +67,8 @@ builder.Services.AddScoped<IUserAddressManager, UserAddressManager>();
 
 //builder.Services.AddScoped<IUserForgotPasswordTokensRepo, UserForgotPasswordTokensRepo>();
 //builder.Services.AddScoped<IUserForgotPasswordTokensManager, UserForgotPasswordTokensManager>();
+
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -75,10 +83,35 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
+app.UseAuthentication(); //login logout
+app.UseAuthorization(); //yetki
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+//Sistem ilk ayaga kalktiginnda rolleri ekleyelim
+//ADMIN, MEMBER, WAITINGFORACTIVATION, PASSIVE
+
+using (var scope = app.Services.CreateScope())
+{
+    var serviceProvider = scope.ServiceProvider;
+
+    //    var roleManager = serviceProvider.
+    //GetRequiredService<RoleManager<AppRole>>();
+
+    CreateData c = new CreateData();
+    //c.CreateRoles(serviceProvider);
+    //c.CreateAllCity(serviceProvider);
+
+    var districtManager = serviceProvider.GetService<IDistrictManager>();
+    var cityManager = serviceProvider.GetService<ICityManager>();
+    c.CreateAllDistrict(districtManager,cityManager);
+
+    c.CreateAllNeighborhood(serviceProvider);
+
+
+}
+
 
 app.Run();

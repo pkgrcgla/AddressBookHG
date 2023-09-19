@@ -42,10 +42,14 @@ namespace AddressBookHG_DL.ContextInfo
             //{
             //    x.ToTable("UserForgotPasswordTokens");
             //});
-            builder.Entity<AppUser>(x =>
-            {
-                x.ToTable("USERS");
-            });
+
+            builder.Entity<City>()
+           .HasIndex(u => u.PlateCode)
+           .IsUnique(true);
+            //builder.Entity<AppUser>(x =>
+            //{
+            //    x.ToTable("USERS");
+            //});
         }
     }
 }

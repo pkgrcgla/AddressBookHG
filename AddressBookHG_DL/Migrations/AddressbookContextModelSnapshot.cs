@@ -50,6 +50,9 @@ namespace AddressBookHG_DL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PlateCode")
+                        .IsUnique();
+
                     b.ToTable("CITY");
                 });
 
@@ -272,7 +275,7 @@ namespace AddressBookHG_DL.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("USERS", (string)null);
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

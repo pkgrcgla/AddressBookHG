@@ -1,4 +1,5 @@
 ﻿using AddressBookHG_PL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -18,6 +19,11 @@ namespace AddressBookHG_PL.Controllers
             return View();
         }
 
+        [Authorize]
+        public IActionResult Indexim()
+        {
+            return View();
+        }
         public IActionResult Privacy()
         {
             return View();

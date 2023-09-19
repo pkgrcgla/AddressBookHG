@@ -1,0 +1,43 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h3>Giriş Yapabilirsiniz</h3>
+
+@if (TempData["RegisterSuccessMsg"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>BİLGİ!</strong> @TempData["RegisterSuccessMsg"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <br />
+}
+
+<div class="row">
+
+    <div class="col-6 offset-3  offset-3">
+
+
+
+        <form asp-controller="Account" asp-action="Login" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="text" class="form-control" name="email" asp-for="@Model" />
+            </div>
+
+            <div class="form-group">
+                <label>Şifre:</label>
+                <input type="password" class="form-control" name="password" />
+            </div>
+
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">GİRİŞ YAP</button>
+                <a asp-controller="Account" asp-action="Register">Üye Olmak için tıklayınız</a>
+            </div>
+
+        </form>
+    </div>
+</div>

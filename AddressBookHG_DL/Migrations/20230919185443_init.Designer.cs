@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AddressBookHG_DL.Migrations
 {
     [DbContext(typeof(AddressbookContext))]
-    [Migration("20230919084159_init")]
+    [Migration("20230919185443_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -52,6 +52,9 @@ namespace AddressBookHG_DL.Migrations
                         .HasColumnType("nvarchar(2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PlateCode")
+                        .IsUnique();
 
                     b.ToTable("CITY");
                 });
@@ -275,7 +278,7 @@ namespace AddressBookHG_DL.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("USERS", (string)null);
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
