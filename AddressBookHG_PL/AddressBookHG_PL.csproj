@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AddressBookHG_BL\AddressBookHG_BL.csproj" />
     <ProjectReference Include="..\AddressBookHG_DL\AddressBookHG_DL.csproj" />
   </ItemGroup>
 
