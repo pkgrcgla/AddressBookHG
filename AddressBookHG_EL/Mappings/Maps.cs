@@ -19,8 +19,8 @@ namespace AddressBookHG_EL.Mappings
             CreateMap<District, DistrictDTO>().ReverseMap();
             CreateMap<Neighborhood, NeighborhoodDTO>().ReverseMap();
             CreateMap<UserAddress, UserAddressDTO>().ReverseMap();
-            //CreateMap<UserForgotPasswordsHistorical, UserForgotPasswordsHistoricalDTO>().ReverseMap();
-            //CreateMap<UserForgotPasswordTokens, UserForgotPasswordTokensDTO>().ReverseMap();
+            CreateMap<UserForgotPasswordsHistorical, UserForgotPasswordsHistoricalDTO>().ReverseMap();
+            CreateMap<UserForgotPasswordTokens, UserForgotPasswordTokensDTO>().ReverseMap();
         }
     }
 }

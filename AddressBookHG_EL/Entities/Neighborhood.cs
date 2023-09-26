@@ -11,7 +11,7 @@ namespace AddressBookHG_EL.Entities
     [Table("NEIGHBORHOOD")]
     public class Neighborhood : BaseNumeric<int>
     {
-        [StringLength(50)]
+        [StringLength(100)]
         [MinLength(2)]
         public string Name { get; set; }
 

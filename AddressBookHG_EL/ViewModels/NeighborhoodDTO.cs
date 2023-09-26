@@ -11,7 +11,7 @@ namespace AddressBookHG_EL.ViewModels
     {
         public int Id { get; set; }
         public DateTime InsertedDate { get; set; }
-        [StringLength(50, ErrorMessage = "Mahalle adı mak 50 karakter olmalıdır!")]
+        [StringLength(100, ErrorMessage = "Mahalle adı mak 100 karakter olmalıdır!")]
         [MinLength(2, ErrorMessage = "Mahalle adı min 2 karakter olmalıdır!")]
         public string Name { get; set; }
         public int DistrictId { get; set; } //FK

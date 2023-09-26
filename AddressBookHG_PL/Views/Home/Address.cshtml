@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Address";
+}
+<div class="row">
+
+
+    <div class="row">
+        <div class="col-6">
+            <label>İl:</label>
+            <select id="cityselect" class="form-control">
+                <option value="0">****İL SEÇİNİZ****</option>
+                @foreach (CityDTO item in ViewBag.AllCity)
+                {
+                    <option value="@item.Id">@item.Name</option>
+
+                }
+            </select>
+        </div>
+
+        <div class="col-6">
+            <label>İlçe:</label>
+
+        </div>
+    </div>
+
+
+</div>

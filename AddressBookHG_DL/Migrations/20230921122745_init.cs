@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 #nullable disable
 
 namespace AddressBookHG_DL.Migrations
+
 {
     /// <inheritdoc />
     public partial class init : Migration
@@ -134,6 +135,52 @@ namespace AddressBookHG_DL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserForgotPasswordsHistorical",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    InsertedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserForgotPasswordsHistorical", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserForgotPasswordsHistorical_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserForgotPasswordTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    InsertedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    TokenUsedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserForgotPasswordTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserForgotPasswordTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DISTRICT",
                 columns: table => new
                 {
@@ -207,7 +254,7 @@ namespace AddressBookHG_DL.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     InsertedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     DistrictId = table.Column<int>(type: "int", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -317,6 +364,16 @@ namespace AddressBookHG_DL.Migrations
                 name: "IX_USERADDRESS_UserId",
                 table: "USERADDRESS",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserForgotPasswordsHistorical_UserId",
+                table: "UserForgotPasswordsHistorical",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserForgotPasswordTokens_UserId",
+                table: "UserForgotPasswordTokens",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -341,13 +398,19 @@ namespace AddressBookHG_DL.Migrations
                 name: "USERADDRESS");
 
             migrationBuilder.DropTable(
+                name: "UserForgotPasswordsHistorical");
+
+            migrationBuilder.DropTable(
+                name: "UserForgotPasswordTokens");
+
+            migrationBuilder.DropTable(
                 name: "ROLES");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "NEIGHBORHOOD");
 
             migrationBuilder.DropTable(
-                name: "NEIGHBORHOOD");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "DISTRICT");

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AddressBookHG_DL.Migrations
 {
     [DbContext(typeof(AddressbookContext))]
-    [Migration("20230919185443_init")]
+    [Migration("20230921122745_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -111,8 +111,8 @@ namespace AddressBookHG_DL.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
@@ -164,6 +164,75 @@ namespace AddressBookHG_DL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("USERADDRESS");
+                });
+
+            modelBuilder.Entity("AddressBookHG_EL.Entities.UserForgotPasswordTokens", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("InsertedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(2);
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("TokenUsedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserForgotPasswordTokens", (string)null);
+                });
+
+            modelBuilder.Entity("AddressBookHG_EL.Entities.UserForgotPasswordsHistorical", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnOrder(1);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("InsertedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnOrder(2);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserForgotPasswordsHistorical", (string)null);
                 });
 
             modelBuilder.Entity("AddressBookHG_EL.IdentityModels.AppRole", b =>
@@ -426,6 +495,28 @@ namespace AddressBookHG_DL.Migrations
                     b.Navigation("AppUser");
 
                     b.Navigation("Neighborhood");
+                });
+
+            modelBuilder.Entity("AddressBookHG_EL.Entities.UserForgotPasswordTokens", b =>
+                {
+                    b.HasOne("AddressBookHG_EL.IdentityModels.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AddressBookHG_EL.Entities.UserForgotPasswordsHistorical", b =>
+                {
+                    b.HasOne("AddressBookHG_EL.IdentityModels.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

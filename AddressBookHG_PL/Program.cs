@@ -10,8 +10,17 @@ using AddressBookHG_PL.CreateDefaultData;
 using AutoMapper.Extensions.ExpressionMapping;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// serilog logger ayarlari
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 //contexti ayarliyoruz.
 builder.Services.AddDbContext<AddressbookContext>(options =>
@@ -62,11 +71,11 @@ builder.Services.AddScoped<INeighborhoodManager, NeighborhoodManager>();
 builder.Services.AddScoped<IUserAddressRepo, UserAddressRepo>();
 builder.Services.AddScoped<IUserAddressManager, UserAddressManager>();
 
-//builder.Services.AddScoped<IUserForgotPasswordsHistoricalRepo, UserForgotPasswordsHistoricalRepo>();
-//builder.Services.AddScoped<IUserForgotPasswordsHistoricalManager, UserForgotPasswordsHistoricalManager>();
+builder.Services.AddScoped<IUserForgotPasswordsHistoricalRepo, UserForgotPasswordsHistoricalRepo>();
+builder.Services.AddScoped<IUserForgotPasswordsHistoricalManager, UserForgotPasswordsHistoricalManager>();
 
-//builder.Services.AddScoped<IUserForgotPasswordTokensRepo, UserForgotPasswordTokensRepo>();
-//builder.Services.AddScoped<IUserForgotPasswordTokensManager, UserForgotPasswordTokensManager>();
+builder.Services.AddScoped<IUserForgotPasswordTokensRepo, UserForgotPasswordTokensRepo>();
+builder.Services.AddScoped<IUserForgotPasswordTokensManager, UserForgotPasswordTokensManager>();
 
 
 // Add services to the container.
@@ -97,16 +106,17 @@ using (var scope = app.Services.CreateScope())
 {
     var serviceProvider = scope.ServiceProvider;
 
-    //    var roleManager = serviceProvider.
-    //GetRequiredService<RoleManager<AppRole>>();
+    var roleManager = serviceProvider.
+    GetRequiredService<RoleManager<AppRole>>();
 
-    CreateData c = new CreateData();
+    CreateData c = new CreateData(logger);
+    
     //c.CreateRoles(serviceProvider);
     //c.CreateAllCity(serviceProvider);
 
-    var districtManager = serviceProvider.GetService<IDistrictManager>();
-    var cityManager = serviceProvider.GetService<ICityManager>();
-    c.CreateAllDistrict(districtManager,cityManager);
+    //var districtManager = serviceProvider.GetService<IDistrictManager>();
+    //var cityManager = serviceProvider.GetService<ICityManager>();
+    //c.CreateAllDistrict(districtManager,cityManager);
 
     c.CreateAllNeighborhood(serviceProvider);
 
