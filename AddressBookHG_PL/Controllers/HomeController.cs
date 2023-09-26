@@ -65,6 +65,54 @@ namespace AddressBookHG_PL.Controllers
             }
         }
 
+        [HttpGet]
+        public JsonResult GetDistrictsofCity(int id)
+        {
+            try
+            {
+                var data = districtManager.GetAll(x => x.CityId == id && !x.IsDeleted).Data.OrderBy(x => x.Name).ToList();
+
+                if (data == null)
+                {
+                    return Json(new { issucces = false, message = "İlçeler bulunamadı!" });
+                }
+
+                return Json(new { issucces = true, message = "İlçeler bulundu!", data });
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"HATA: Home/GetDistrictsofCity cityId:{id}");
+                return Json(new { issucces = false, message = ex.Message });
+            }
+        }
+
+
+
+        [HttpGet]
+        public JsonResult GetNeighborhoodsofDistrict(int id)
+        {
+            try
+            {
+                var data = _neighborhoodManager.GetAll(x => x.DistrictId == id && !x.IsDeleted).Data.OrderBy(x => x.Name).ToList(); ;
+
+                if (data == null)
+                {
+                    return Json(new { issucces = false, message = "Mahalle bulunamadı!" });
+                }
+
+                return Json(new { issucces = true, message = "Mahalle bulundu!", data });
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"HATA: Home/GetNeighborhoodsofDistrict district:{id}");
+                return Json(new { issucces = false, message = ex.Message });
+            }
+        }
+
 
     }
 }

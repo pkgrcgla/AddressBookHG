@@ -3,10 +3,9 @@
 }
 <div class="row">
 
-
     <div class="row">
         <div class="col-6">
-            <label>İl:</label>
+            <label>İl:</label> <br />  <br />
             <select id="cityselect" class="form-control">
                 <option value="0">****İL SEÇİNİZ****</option>
                 @foreach (CityDTO item in ViewBag.AllCity)
@@ -18,10 +17,187 @@
         </div>
 
         <div class="col-6">
-            <label>İlçe:</label>
+            <label>İlçe:</label> <br />  <br />
+            <select id="districtselect" class="form-control">
+                <option value="0">****İLÇE SEÇİNİZ****</option>
 
+            </select>
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-6">
+            <label>Mahalle:</label> <br />
+            <select id="neigborhoodselect" class="form-control">
+                <option value="0">****MAHALLE SEÇİNİZ****</option>
+            </select>
+        </div>
 
+        <div class="col-6">
+            <label>Posta Kodu:</label> <br />
+            <input type="text" class="form-control" id="postalcode" />
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-6">
+            <label>Adres Detay:</label> <br />
+            <textarea type="text" class="form-control" rows="2" id="addressDetail"></textarea>
+        </div>
+        <div class="col-6">
+            <label>Adres Başlığı</label> <br />
+            <input type="text" class="form-control" id="addressTitle" />
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-12">
+
+            <button type="button" class="btn btn-primary" id="btnSave">ADRESİ KAYDET</button>
+        </div>
+    </div>
 </div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+
+            //ilçe ve mahalle combsu pasif olsun
+            $("#districtselect").attr("disabled", true);
+            $("#neigborhoodselect").attr("disabled", true);
+            $("#postalcode").attr("disabled", true);
+
+            $("#cityselect").change(function () {
+                //temizlik
+                //ilçe ve mahalle temizlenmeli
+                $('#districtselect').empty();
+                $('#districtselect').append('<option value="0" selected>****İLÇE SEÇİNİZ****</option>');
+
+                $('#neigborhoodselect').empty();
+                $('#neigborhoodselect').append('<option value="0" selected>****MAHALLE SEÇİNİZ****</option>');
+                $("#districtselect").attr("disabled", true);
+                $("#neigborhoodselect").attr("disabled", true);
+
+
+                var city = $("#cityselect").val();
+                if (city > 0) {
+                    //burada seçilen ile ait ilçeleri almalıyım
+                    $.ajax({
+                        url: "/Home/GetDistrictsofCity/" + city,
+                        type: "GET",
+                        success: function (res) {
+                            console.log(res);
+                            //ilçe combosunu temizlesin
+                            $('#districtselect').empty();
+                            $('#districtselect').append('<option value="0" selected>****İLÇE SEÇİNİZ****</option>');
+
+                            if (res.data.length > 0) {
+                                alert("İlçe seçebilirsiniz...")
+
+                                //ilçe combosu açılacak
+                                $("#districtselect").attr("disabled", false);
+
+                                res.data.forEach(function (item) {
+                                    //1. yol
+                                    // $('#districtselect').append('<option value="' + item.id + '" >' + item.name + '</option>');
+
+                                    //2. yol daha sade
+                                    $("#districtselect").append($("<option />")
+                                        .val(item.id).text(item.name));
+                                });
+
+
+                                //for ile yapmak çok uzun oldu bu nedenle foreach daha güzel
+                                // for (var i = 0; i < res.data.data.length; i++) {
+                                //     console.log(res.data.data[i].id);
+                                //     console.log(res.data.data[i].name);
+                                // }
+                            }
+
+                        },
+                        error: function (err) {
+                            alert("Beklenmedik hata oluştu!" + err);
+                        }
+
+                    });
+
+                }
+
+            }); //cityselect bitti
+
+
+
+            $("#districtselect").change(function () {
+                //temizlik
+                $('#neigborhoodselect').empty();
+                $('#neigborhoodselect').append('<option value="0" selected>****MAHALLE SEÇİNİZ****</option>');
+                $("#neigborhoodselect").attr("disabled", true);
+
+
+
+                var district = $("#districtselect").val();
+                if (district > 0) {
+                    //burada seçilen ilçeye ait mahalleleri almalıyım
+                    $.ajax({
+                        url: "/Home/GetNeighborhoodsofDistrict/" + district,
+                        type: "GET",
+                        success: function (res) {
+                            console.log(res.data);
+                            //Mahalle combosunu temizlesin
+                            $('#neigborhoodselect').empty();
+                            $('#neigborhoodselect').append('<option value="0" selected>****MAHALLE SEÇİNİZ****</option>');
+
+                            if (res.data.length > 0) {
+                                alert("Mahalle seçebilirsiniz...")
+
+                                //ilçe combosu açılacak
+                                $("#neigborhoodselect").attr("disabled", false);
+
+                                res.data.forEach(function (item) {
+
+                                    //2. yol daha sade
+                                    $("#neigborhoodselect").append($("<option />")
+                                        .val(item.id).text(item.name));
+                                });
+
+                            }
+
+                        },
+                        error: function (err) {
+                            alert("Beklenmedik hata oluştu!" + err);
+                        }
+
+                    });
+
+                }
+
+            }); //districtselect bitti
+
+            $("#btnSave").click(function () {
+
+                if ($("#neigborhoodselect").val() == 0) {
+                    alert("Adres ekleyebilmek için il ilçe mahalle seçilmelidir..");
+                    return;
+                }
+                if ($("#addressTitle").val().length == 0) {
+                    alert("Adres başlığını giriniz...");
+                    return;
+                }
+
+                if ($("#addressDetail").val().length == 0) {
+                    alert("Adres detayını giriniz...");
+                    return;
+                }
+
+
+
+                alert("adresi ekleyecek kodları yazacağız")
+
+            });
+
+        }); // document ready bitti
+
+    </script>
+
+}

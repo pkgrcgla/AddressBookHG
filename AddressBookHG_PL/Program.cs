@@ -112,11 +112,11 @@ using (var scope = app.Services.CreateScope())
     CreateData c = new CreateData(logger);
     
     //c.CreateRoles(serviceProvider);
-    //c.CreateAllCity(serviceProvider);
+    c.CreateAllCity(serviceProvider);
 
-    //var districtManager = serviceProvider.GetService<IDistrictManager>();
-    //var cityManager = serviceProvider.GetService<ICityManager>();
-    //c.CreateAllDistrict(districtManager,cityManager);
+    var districtManager = serviceProvider.GetService<IDistrictManager>();
+    var cityManager = serviceProvider.GetService<ICityManager>();
+    c.CreateAllDistrict(districtManager,cityManager);
 
     c.CreateAllNeighborhood(serviceProvider);
 
