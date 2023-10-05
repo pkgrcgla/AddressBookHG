@@ -18,6 +18,6 @@ namespace AddressBookHG_EL.IdentityModels
         public DateTime? BirthDate { get; set; }
         //Gender
         //Height
-
+        public string? ProfilePicture { get; set; }
     }
 }

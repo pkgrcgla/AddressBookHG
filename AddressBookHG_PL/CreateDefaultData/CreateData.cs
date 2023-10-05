@@ -14,12 +14,12 @@ namespace AddressBookHG_PL.CreateDefaultData
 {
     public class CreateData
     {
-        private readonly Logger _logger;
+        //private readonly Logger _logger;
 
-        public CreateData(Logger logger)
-        {
-            _logger = logger;
-        }
+        //public CreateData(Logger logger)
+        //{
+        //    _logger = logger;
+        //}
 
         public void CreateRoles(IServiceProvider serviceProvider)
             {
@@ -76,54 +76,55 @@ namespace AddressBookHG_PL.CreateDefaultData
 
             }
 
-            public void CreateAllCity(IServiceProvider serviceProvider)
+        public void CreateAllCity(IServiceProvider serviceProvider)
+        {
+            try
             {
-                try
+                //manager almak zorunda değilsiniz repoda alabilirdiniz...
+                var cityManager = serviceProvider.GetRequiredService<ICityManager>();
+
+                //var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles");
+                //var filename = "Cities.xlsx";
+                //var filePath=Path.Combine(path, filename);
+
+                var file = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles", "Cities.xlsx");
+
+                using (var wbook = new XLWorkbook(file))
                 {
-                    //manager almak zorunda değilsiniz repoda alabilirdiniz...
-                    var cityManager = serviceProvider.GetRequiredService<ICityManager>();
-
-                    //var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles");
-                    //var filename = "Cities.xlsx";
-                    //var filePath=Path.Combine(path, filename);
-
-                    var file = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ExcelFiles", "Cities.xlsx");
-
-                    using (var wbook = new XLWorkbook(file))
+                    var ws1 = wbook.Worksheet(1);
+                    var rows = ws1.RowsUsed();
+                    foreach (var item in rows)
                     {
-                        var ws1 = wbook.Worksheet(1);
-                        var rows = ws1.RowsUsed();
-                        foreach (var item in rows)
+                        if (item.RowNumber() > 1) // başlık satırını atladık
                         {
-                            if (item.RowNumber() > 1) // başlık satırını atladık
+                            var cityname = item.Cell(1).Value.ToString();
+                            var platecode = item.Cell("B").Value.ToString();
+                            CityDTO c = new CityDTO()
                             {
-                                var cityname = item.Cell(1).Value.ToString();
-                                var platecode = item.Cell("B").Value.ToString();
-                                CityDTO c = new CityDTO()
-                                {
-                                    InsertedDate = DateTime.Now,
-                                    Name = cityname,
-                                    PlateCode = platecode,
-                                    IsDeleted = false
-                                };
-                                //eğer bu il veritabanında yoksa ekle!
-                                if (cityManager.GetByCondition(x => x.Name.ToLower() == cityname.ToLower()).Data == null)
-                                {
-                                    cityManager.Add(c);
+                                InsertedDate = DateTime.Now,
+                                Name = cityname,
+                                PlateCode = platecode,
+                                IsDeleted = false
+                            };
+                            //eğer bu il veritabanında yoksa ekle!
+                            if (cityManager.GetByCondition(x => x.Name.ToLower() == cityname.ToLower()).Data == null)
+                            {
+                                cityManager.Add(c);
 
-                                }
                             }
                         }
                     }
                 }
-                catch (Exception)
-                {
-                    //loglanabilir
-                }
             }
+            catch (Exception)
+            {
+                //loglanabilir
+            }
+        }
 
 
-            public void CreateAllDistrict(IDistrictManager districtManager, ICityManager cityManager)
+
+        public void CreateAllDistrict(IDistrictManager districtManager, ICityManager cityManager)
             {
                 try
                 {
@@ -138,11 +139,13 @@ namespace AddressBookHG_PL.CreateDefaultData
                             if (item.RowNumber() > 1) // başlık satırını atladık
                             {
                                 var districtname = item.Cell(1).Value.ToString();
-                                var cityplatecode = item.Cell(2).Value.ToString();
+                            //var cityplatecode = item.Cell(2).Value.ToString();
+                            var cityplatecode = item.Cell(2).Value.ToString();
 
-                                var city = cityManager.GetByCondition(x => x.PlateCode == cityplatecode).Data;
+                            var city = cityManager.GetByCondition(x => x.PlateCode == cityplatecode).Data;
 
-                                DistrictDTO d = new DistrictDTO()
+
+                            DistrictDTO d = new DistrictDTO()
                                 {
                                     InsertedDate = DateTime.Now,
                                     CityId = city.Id,
@@ -194,9 +197,7 @@ namespace AddressBookHG_PL.CreateDefaultData
 
                                 var city = context.CityTable.Where(x => x.Name.ToLower() == cityname.ToLower()).FirstOrDefault();
 
-                                var district = context.DistrictTable.Where(x =>
-                                x.Name.ToLower() == districtname.ToLower()
-                                && x.CityId == city.Id).FirstOrDefault();
+                                var district = context.DistrictTable.Where(x => x.Name.ToLower() == districtname.ToLower()&& x.CityId == city.Id).FirstOrDefault();
 
                                 Neighborhood n = new Neighborhood()
                                 {
@@ -215,7 +216,7 @@ namespace AddressBookHG_PL.CreateDefaultData
                                 {
                                     context.NeighborhoodTable.Add(n);                                  
                                     context.SaveChanges();
-                                _logger.Information($"{DateTime.Now.ToString()} -  CreateData/CreateAllNeighborhood  - BİLGİ: {neigh} mahallesi eklendi ");
+                                //_logger.Information($"{DateTime.Now.ToString()} -  CreateData/CreateAllNeighborhood  - BİLGİ: {neigh} mahallesi eklendi ");
 
                             }
                             }
@@ -224,7 +225,7 @@ namespace AddressBookHG_PL.CreateDefaultData
                 }
             catch (Exception ex)
             {
-                _logger.Error($"{DateTime.Now.ToString()} -  CreateData/CreateAllNeighborhood  - HATA: {ex} ");
+                //_logger.Error($"{DateTime.Now.ToString()} -  CreateData/CreateAllNeighborhood  - HATA: {ex} ");
 
             }
         }

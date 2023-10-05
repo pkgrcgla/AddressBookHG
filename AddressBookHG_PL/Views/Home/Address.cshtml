@@ -1,8 +1,9 @@
-﻿@{
+﻿﻿@{
     ViewData["Title"] = "Address";
 }
 <div class="row">
 
+    <input type="hidden" value="@ViewBag.UserId" id="userid" />
     <div class="row">
         <div class="col-6">
             <label>İl:</label> <br />  <br />
@@ -53,10 +54,15 @@
     <div class="row">
 
         <div class="col-12">
-
+            <input type="checkbox" id="isDefaultAddress" name="defaultAddress">
+            <label for="defaultAddress"> VARSAYILAN ADRES OLARAK AYARLA</label><br>
             <button type="button" class="btn btn-primary" id="btnSave">ADRESİ KAYDET</button>
         </div>
     </div>
+
+</div>
+
+<div class="row" id="addressDiv" style="margin-top:20px">
 </div>
 
 @section Scripts{
@@ -68,6 +74,9 @@
             $("#neigborhoodselect").attr("disabled", true);
             $("#postalcode").attr("disabled", true);
 
+            //usera ait adresleri çağıralım
+            GetAllAddress();
+
             $("#cityselect").change(function () {
                 //temizlik
                 //ilçe ve mahalle temizlenmeli
@@ -78,6 +87,7 @@
                 $('#neigborhoodselect').append('<option value="0" selected>****MAHALLE SEÇİNİZ****</option>');
                 $("#districtselect").attr("disabled", true);
                 $("#neigborhoodselect").attr("disabled", true);
+                $("#postalcode").val('');
 
 
                 var city = $("#cityselect").val();
@@ -133,6 +143,7 @@
                 $('#neigborhoodselect').empty();
                 $('#neigborhoodselect').append('<option value="0" selected>****MAHALLE SEÇİNİZ****</option>');
                 $("#neigborhoodselect").attr("disabled", true);
+                $("#postalcode").val('');
 
 
 
@@ -174,8 +185,39 @@
 
             }); //districtselect bitti
 
-            $("#btnSave").click(function () {
+            $("#neigborhoodselect").change(function () {
+                $("#postalcode").val('');
+                var city = $("#cityselect").val();
+                var district = $("#districtselect").val();
+                var neigh = $("#neigborhoodselect").val();
 
+                if (neigh > 0) {
+                    //posta kodu cagiralim
+                    $.ajax({
+                        url: '/Home/GetPostalCode?cityid=' + city + '&districtid=' + district + '&neighid=' + neigh,
+                        type: 'get',
+                        success: function (res) {
+                            console.log(res);
+                            if (res.issuccess) {
+                                var postalcode = res.postalcode;
+                                $("#postalcode").val(postalcode);
+                            }
+                            else {
+                                alert(res.message);
+                            }
+                        },
+                        error: function (err) {
+                            alert(err.message)
+                        }
+
+                    });
+                }
+
+            });
+
+
+
+            $("#btnSave").click(function () {
                 if ($("#neigborhoodselect").val() == 0) {
                     alert("Adres ekleyebilmek için il ilçe mahalle seçilmelidir..");
                     return;
@@ -190,14 +232,178 @@
                     return;
                 }
 
+                var isDefaultAddress = false;
+
+                if ($('#isDefaultAddress').is(':checked')) {
+                    isDefaultAddress = true;
+                }
 
 
-                alert("adresi ekleyecek kodları yazacağız")
+                // var userid = $("#userid").val();
+                var userid = '@ViewBag.UserId';
+                console.log(userid);
+
+
+
+                var address =
+                {
+                    Title: $("#addressTitle").val(),
+                    Details: $("#addressDetail").val(),
+                    NeighborhoodId: $("#neigborhoodselect").val(),
+                    UserId: userid,
+                    IsDefaultAddress: isDefaultAddress
+                };
+
+                $.ajax({
+                    url: "/Home/AddAddress",
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(address),
+                    success: function (res) {
+                        //yeni adres eklediği için metodu tekrar çağırdık
+                        alert(res.message);
+                        Temizle();
+                        GetAllAddress();
+                    },
+                    error: function (err) {
+                        alert(err);
+                    }
+
+                }); // ajax bitti
+
 
             });
 
         }); // document ready bitti
 
+
+        function GetAllAddress() {
+            $.ajax({
+                url: "/Home/GetAllAddress",
+                type: "GET",
+                success: function (res) {
+                    console.log(res);
+
+                    //address
+                    var div = $("#addressDiv");
+                    div.html('');
+                    var content = "";
+                    var defaultAdresscontent = "";
+                    res.address.forEach(function (item) {
+                        console.log(item.isDefaultAddress)
+
+                        if (item.isDefaultAddress == true) {
+                            console.log("geldi")
+                            //1. yol
+                            defaultAdresscontent =
+                                '<div style="background-color:red;"class="col-sm-4" style="margin-top:10px"><div class="card"><div class="card-body"><h6 class="card-title text-danger"> * Varsayılan Adrestir *</h6><h5 class="card-title text-danger">' + item.title + '</h5>                                       <p class="card-text">' + item.addressDetail + '</p><p class="card-text" > ' + item.cityandDistrict + ' </p><button class="btn btn-primary" onclick=DeleteAddress(' + item.id + ')>SİL </button></div></div></div>';
+                        } else {
+                            //1. yol
+                            content +=
+                                '<div class="col-sm-4" style="margin-top:10px"><div class="card"><div class="card-body"><h5 class="card-title">' + item.title + '</h5>                                       <p class="card-text">' + item.addressDetail + '</p><p class="card-text" > ' + item.cityandDistrict + ' </p><button class="btn btn-primary" onclick=DeleteAddress(' + item.id + ')>SİL </button></div></div></div>';
+                        }
+
+
+
+                        //2. yol
+                        // var colsm4div = document.createElement("div");
+                        // colsm4div.style = "margin-top:10px";
+                        // colsm4div.classList.add('col-sm-4');
+
+                        // var cardDiv = document.createElement("div");
+                        // cardDiv.classList.add('card');
+
+                        // var cardBody = document.createElement("div");
+                        // cardBody.classList.add('card-body');
+
+                        // var h5 = document.createElement("h5");
+                        // h5.classList.add('card-title');
+
+                        // var p = document.createElement("p");
+                        // p.classList.add('card-text');
+
+                        // var a = document.createElement("a");
+                        // a.classList.add('btn btn-primary');
+                        // cardBody.appendChild(h5);
+                        // cardBody.appendChild(p);
+                        // cardBody.appendChild(a);
+                        // cardDiv.appendChild(cardBody);
+                        // colsm4div.appendChild(cardDiv);
+
+                    }); //foreach burada bitti.
+                    div.html(defaultAdresscontent + content);
+                },
+                error: function (err) {
+                    alert("Beklenmedik hata oluştu!" + err);
+                }
+
+            });
+        } // GetAllAddress fonk bitti
+
+
+        $("#isDefaultAddress").change(function () {
+            console.log("checkboxa geldi")
+        });
+
+
+        function Temizle() {
+
+            $("#addressDetail").val('');
+            $("#addressTitle").val('');
+            $("#neigborhoodselect").val(0);
+            $("#districtselect").val(0);
+            $("#cityselect").val(0);
+            $('#isDefaultAddress').prop('checked', false);
+        }
+
+
+        function DeleteAddress(id) {
+
+            Swal.fire({
+                title: 'SORU',
+                text: "Adresi silmek istediğinize emin misiniz?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'EVET!',
+                cancelButtonText: 'HAYIR!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/Home/DeleteAddress/' + id,
+                        type: 'get',
+                        success: function (res) {
+                            if (res.issuccess) {
+                                Swal.fire(
+                                    'BİLGİ!',
+                                    'Adres silindi!',
+                                    'success'
+                                )
+                                GetAllAddress();
+                            } else {
+                                alert("Adres silinemedi!");
+                            }
+                        },
+                        error: function (err) {
+                            alert("Beklenmedik bir hata oluştu!");
+                        }
+
+
+                    });
+
+
+
+
+
+
+                }
+            })
+
+
+
+        }
     </script>
 
 }

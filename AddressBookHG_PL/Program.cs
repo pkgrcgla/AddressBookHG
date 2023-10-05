@@ -7,6 +7,7 @@ using AddressBookHG_DL.InterfaceOfRepos;
 using AddressBookHG_EL.IdentityModels;
 using AddressBookHG_EL.Mappings;
 using AddressBookHG_PL.CreateDefaultData;
+using AddressBookHG_PL.Models;
 using AutoMapper.Extensions.ExpressionMapping;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +52,7 @@ builder.Services.AddAutoMapper(a =>
 {
     a.AddExpressionMapping();
     a.AddProfile(typeof(Maps));
+    a.CreateMap<AppUser, ProfileViewModel>();
 });
 
 //interfacelerin DI yasam dongusu
@@ -106,22 +108,21 @@ using (var scope = app.Services.CreateScope())
 {
     var serviceProvider = scope.ServiceProvider;
 
-    var roleManager = serviceProvider.
-    GetRequiredService<RoleManager<AppRole>>();
+    //var roleManager = serviceProvider.
+    //GetRequiredService<RoleManager<AppRole>>();
 
-    CreateData c = new CreateData(logger);
-    
-    //c.CreateRoles(serviceProvider);
+    CreateData c = new CreateData();
+
+    // c.CreateRoles(serviceProvider);
     c.CreateAllCity(serviceProvider);
 
     var districtManager = serviceProvider.GetService<IDistrictManager>();
     var cityManager = serviceProvider.GetService<ICityManager>();
     c.CreateAllDistrict(districtManager,cityManager);
-
     c.CreateAllNeighborhood(serviceProvider);
 
 
-}
 
+}
 
 app.Run();

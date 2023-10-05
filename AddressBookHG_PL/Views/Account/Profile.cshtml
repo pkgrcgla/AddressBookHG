@@ -1,0 +1,71 @@
+﻿@model ProfileViewModel
+@{
+    ViewData["Title"] = "Profile";
+}
+
+
+@if (!string.IsNullOrEmpty(ViewBag.ProfilePageMsg))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>BİLGİ!</strong> @ViewBag.ProfilePageMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <br />
+}
+<form asp-controller="Account" asp-action="Profile" method="post"
+      enctype="multipart/form-data">
+     
+    <div class="row">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="col-6">
+            @if (Model.ProfilePicture==null)
+            {
+            <img src="~/Anonymous-Profile-pic.jpg"
+                style="width:250px;height:250px"/> <br />  <br />
+                <input type="file" class="from-control" asp-for="ChosenPicture" accept=".png, .jpg" />
+
+             }else
+            {
+                <img src="@Model.ProfilePicture"
+                    style="width:250px;height:250px" /> <br />  <br />
+                <input type="file" class="from-control" asp-for="ChosenPicture"
+                       accept=".png, .jpg" />
+
+            }
+        </div>
+
+        <div class="col-6">
+            <div class="form-group">
+                <label>Ad</label>
+                <input type="text" asp-for="Name" class="form-control"/>
+            </div>
+
+            <div class="form-group">
+                <label>Soyad</label>
+                <input type="text" asp-for="Surname" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Doğum Tarihi</label>
+                <input type="date" asp-for="BirthDate" class="form-control" />
+               
+            </div>
+
+            <div class="form-group">
+                <label>Kullanıcı Adı</label>
+                <input type="text" asp-for="UserName" class="form-control" disabled />
+
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="text" asp-for="Email" class="form-control" disabled />
+
+            </div>
+
+            <div class="form-group">
+                <input type="submit"  class="btn btn-success" value="GÜNCELLE" />
+
+            </div>
+        </div>
+    </div>
+</form>
