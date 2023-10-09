@@ -28,7 +28,7 @@ builder.Services.AddDbContext<AddressbookContext>(options =>
 {
     //klasik mvcde connection string web configte yer alir.
     //core mvcde connection string appsetting.json dosyasindan alinir.
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyLocal"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Betul"));
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
 });
